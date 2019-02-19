@@ -194,6 +194,21 @@ namespace AuthorizationServer
                     await manager.CreateAsync(descriptor);
                 }
 
+                if (await manager.FindByClientIdAsync("webapi1") == null)
+                {
+                    var descriptor = new OpenIddictApplicationDescriptor
+                    {
+                        ClientId = "webapi1",
+                        ClientSecret = "846B62D0-DEF9-4215-A99D-86E6B8DAB342",
+                        Permissions =
+                            {
+                                OpenIddictConstants.Permissions.Endpoints.Introspection
+                            }
+                    };
+
+                    await manager.CreateAsync(descriptor);
+                }
+
                 //if (await manager.FindByClientIdAsync("mvc") == null)
                 //{
                 //    var descriptor = new OpenIddictApplicationDescriptor
@@ -219,20 +234,7 @@ namespace AuthorizationServer
                 //    await manager.CreateAsync(descriptor);
                 //}
 
-                if (await manager.FindByClientIdAsync("webapi1") == null)
-                {
-                    var descriptor = new OpenIddictApplicationDescriptor
-                    {
-                        ClientId = "webapi1",
-                        ClientSecret = "846B62D0-DEF9-4215-A99D-86E6B8DAB342",
-                        Permissions =
-                            {
-                                OpenIddictConstants.Permissions.Endpoints.Introspection
-                            }
-                    };
 
-                    await manager.CreateAsync(descriptor);
-                }
 
 
             }
