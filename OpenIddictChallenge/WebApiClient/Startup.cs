@@ -25,7 +25,7 @@ namespace Mvc.Client
             .AddOAuthIntrospection(options =>
             {
                 options.Authority = new Uri("http://localhost:44300/");
-                options.Audiences.Add("webapi1");
+                //options.Audiences.Add("webapi1");
                 options.ClientId = "webapi1";
                 options.ClientSecret = "846B62D0-DEF9-4215-A99D-86E6B8DAB342";
                 options.RequireHttpsMetadata = false;
