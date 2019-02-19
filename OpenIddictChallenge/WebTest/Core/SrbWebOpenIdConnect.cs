@@ -9,12 +9,15 @@ namespace SRPIntranet.IntegrationTest
     {
         private readonly string _urlBase;
         private readonly string _scope;
+        private readonly string _clientId;
+
         public TokenOppenIdConnect TokenOpenId { get; set; }
 
-        public SrbWebOpenIdConnect(string urlBase, string scope = "openid email profile offline_access roles")
+        public SrbWebOpenIdConnect(string urlBase, string scope, string clientId)
         {
             _urlBase = urlBase;
             _scope = scope;
+            _clientId = clientId;
         }
 
         public void Connect(string login, string pwd, string urlLogin)
@@ -28,8 +31,10 @@ namespace SRPIntranet.IntegrationTest
                         ["grant_type"] = "password",
                         ["username"] = login,
                         ["password"] = pwd,
-                        ["scope"] = _scope
+                        ["scope"] = _scope,
+                        ["client_id"] = _clientId
                     });
+
 
                     var response = client.SendAsync(request, HttpCompletionOption.ResponseContentRead).Result;
                     response.EnsureSuccessStatusCode();

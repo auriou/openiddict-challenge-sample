@@ -85,8 +85,14 @@ namespace AuthorizationServer
                     options.EnableTokenEndpoint("/connect/token");
 
                     // Enable the password and the refresh token flows.
-                    options.AllowPasswordFlow()
+                    options
+                    //.AllowAuthorizationCodeFlow()
+                    .AllowPasswordFlow()
                            .AllowRefreshTokenFlow();
+
+                    options.RegisterScopes(OpenIddictConstants.Scopes.Email,
+                                           OpenIddictConstants.Scopes.Profile,
+                                           OpenIddictConstants.Scopes.Roles);
 
                     // Accept anonymous clients (i.e clients that don't send a client_id).
                     options.AcceptAnonymousClients();
@@ -168,60 +174,67 @@ namespace AuthorizationServer
 
                 var manager = scope.ServiceProvider.GetRequiredService<OpenIddictApplicationManager<OpenIddictApplication>>();
 
-                if (await manager.FindByClientIdAsync("mvc") == null)
+                if (await manager.FindByClientIdAsync("webtest") == null)
                 {
                     var descriptor = new OpenIddictApplicationDescriptor
                     {
-                        ClientId = "mvc",
-                        ClientSecret = "901564A5-E7FE-42CB-B10D-61EF6A8F3654",
-                        DisplayName = "MVC client application",
-                        PostLogoutRedirectUris = { new Uri("http://localhost:44301/signout-callback-oidc") },
-                        RedirectUris = { new Uri("http://localhost:44301/signin-oidc") },
+                        ClientId = "webtest",
+                        DisplayName = "webtest client application",
                         Permissions =
-                        {
-                            OpenIddictConstants.Permissions.Endpoints.Authorization,
-                            OpenIddictConstants.Permissions.Endpoints.Logout,
-                            OpenIddictConstants.Permissions.Endpoints.Token,
-                            OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                            OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                            OpenIddictConstants.Permissions.Scopes.Email,
-                            OpenIddictConstants.Permissions.Scopes.Profile,
-                            OpenIddictConstants.Permissions.Scopes.Roles
+                            {
+                                OpenIddictConstants.Permissions.Endpoints.Token,
+                                OpenIddictConstants.Permissions.GrantTypes.Password,
+                                OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                                OpenIddictConstants.Permissions.Scopes.Email,
+                                OpenIddictConstants.Permissions.Scopes.Profile,
+                                OpenIddictConstants.Permissions.Scopes.Roles
                         }
                     };
 
                     await manager.CreateAsync(descriptor);
                 }
 
-                // To test this sample with Postman, use the following settings:
-                //
-                // * Authorization URL: http://localhost:54540/connect/authorize
-                // * Access token URL: http://localhost:54540/connect/token
-                // * Client ID: postman
-                // * Client secret: [blank] (not used with public clients)
-                // * Scope: openid email profile roles
-                // * Grant type: authorization code
-                // * Request access token locally: yes
-                if (await manager.FindByClientIdAsync("postman") == null)
+                //if (await manager.FindByClientIdAsync("mvc") == null)
+                //{
+                //    var descriptor = new OpenIddictApplicationDescriptor
+                //    {
+                //        ClientId = "mvc",
+                //        ClientSecret = "901564A5-E7FE-42CB-B10D-61EF6A8F3654",
+                //        DisplayName = "MVC client application",
+                //        PostLogoutRedirectUris = { new Uri("http://localhost:44301/signout-callback-oidc") },
+                //        RedirectUris = { new Uri("http://localhost:44301/signin-oidc") },
+                //        Permissions =
+                //        {
+                //            OpenIddictConstants.Permissions.Endpoints.Authorization,
+                //            OpenIddictConstants.Permissions.Endpoints.Logout,
+                //            OpenIddictConstants.Permissions.Endpoints.Token,
+                //            OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                //            OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                //            OpenIddictConstants.Permissions.Scopes.Email,
+                //            OpenIddictConstants.Permissions.Scopes.Profile,
+                //            OpenIddictConstants.Permissions.Scopes.Roles
+                //        }
+                //    };
+
+                //    await manager.CreateAsync(descriptor);
+                //}
+
+                if (await manager.FindByClientIdAsync("webapi1") == null)
                 {
                     var descriptor = new OpenIddictApplicationDescriptor
                     {
-                        ClientId = "postman",
-                        DisplayName = "Postman",
-                        RedirectUris = { new Uri("https://www.getpostman.com/oauth2/callback") },
+                        ClientId = "webapi1",
+                        ClientSecret = "846B62D0-DEF9-4215-A99D-86E6B8DAB342",
                         Permissions =
-                        {
-                            OpenIddictConstants.Permissions.Endpoints.Authorization,
-                            OpenIddictConstants.Permissions.Endpoints.Token,
-                            OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                            OpenIddictConstants.Permissions.Scopes.Email,
-                            OpenIddictConstants.Permissions.Scopes.Profile,
-                            OpenIddictConstants.Permissions.Scopes.Roles
-                        }
+                            {
+                                OpenIddictConstants.Permissions.Endpoints.Introspection
+                            }
                     };
 
                     await manager.CreateAsync(descriptor);
                 }
+
+
             }
         }
     }
