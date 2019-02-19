@@ -70,7 +70,7 @@ namespace SRPIntranet.IntegrationTest
             }
         }
 
-        public string TestUrl(string url, HttpMethod method, HttpContent content = null)
+        public string TestApi(string url, HttpMethod method, HttpContent content = null)
         {
             var requestUrl = (url.ToLower().StartsWith("http")) ? url : $"{_urlBase}{url}";
             using (var client = new HttpClient())

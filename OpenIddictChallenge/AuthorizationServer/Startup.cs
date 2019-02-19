@@ -7,6 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 using SRPIntranet.Security.Identity.Models;
 using SRPIntranet.Security;
 using SRPIntranet.Security.Identity;
+using System.Threading.Tasks;
+using System;
+using OpenIddict.Core;
+using OpenIddict.EntityFrameworkCore.Models;
+using OpenIddict.Abstractions;
 
 namespace AuthorizationServer
 {
@@ -150,6 +155,74 @@ namespace AuthorizationServer
             app.UseAuthentication();
 
             app.UseMvcWithDefaultRoute();
+            InitializeAsync(app.ApplicationServices).GetAwaiter().GetResult();
+        }
+
+        private async Task InitializeAsync(IServiceProvider services)
+        {
+            // Create a new service scope to ensure the database context is correctly disposed when this methods returns.
+            using (var scope = services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                await context.Database.EnsureCreatedAsync();
+
+                var manager = scope.ServiceProvider.GetRequiredService<OpenIddictApplicationManager<OpenIddictApplication>>();
+
+                if (await manager.FindByClientIdAsync("mvc") == null)
+                {
+                    var descriptor = new OpenIddictApplicationDescriptor
+                    {
+                        ClientId = "mvc",
+                        ClientSecret = "901564A5-E7FE-42CB-B10D-61EF6A8F3654",
+                        DisplayName = "MVC client application",
+                        PostLogoutRedirectUris = { new Uri("http://localhost:44301/signout-callback-oidc") },
+                        RedirectUris = { new Uri("http://localhost:44301/signin-oidc") },
+                        Permissions =
+                        {
+                            OpenIddictConstants.Permissions.Endpoints.Authorization,
+                            OpenIddictConstants.Permissions.Endpoints.Logout,
+                            OpenIddictConstants.Permissions.Endpoints.Token,
+                            OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                            OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                            OpenIddictConstants.Permissions.Scopes.Email,
+                            OpenIddictConstants.Permissions.Scopes.Profile,
+                            OpenIddictConstants.Permissions.Scopes.Roles
+                        }
+                    };
+
+                    await manager.CreateAsync(descriptor);
+                }
+
+                // To test this sample with Postman, use the following settings:
+                //
+                // * Authorization URL: http://localhost:54540/connect/authorize
+                // * Access token URL: http://localhost:54540/connect/token
+                // * Client ID: postman
+                // * Client secret: [blank] (not used with public clients)
+                // * Scope: openid email profile roles
+                // * Grant type: authorization code
+                // * Request access token locally: yes
+                if (await manager.FindByClientIdAsync("postman") == null)
+                {
+                    var descriptor = new OpenIddictApplicationDescriptor
+                    {
+                        ClientId = "postman",
+                        DisplayName = "Postman",
+                        RedirectUris = { new Uri("https://www.getpostman.com/oauth2/callback") },
+                        Permissions =
+                        {
+                            OpenIddictConstants.Permissions.Endpoints.Authorization,
+                            OpenIddictConstants.Permissions.Endpoints.Token,
+                            OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                            OpenIddictConstants.Permissions.Scopes.Email,
+                            OpenIddictConstants.Permissions.Scopes.Profile,
+                            OpenIddictConstants.Permissions.Scopes.Roles
+                        }
+                    };
+
+                    await manager.CreateAsync(descriptor);
+                }
+            }
         }
     }
 }

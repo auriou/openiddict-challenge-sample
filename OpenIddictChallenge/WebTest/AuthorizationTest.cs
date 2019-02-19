@@ -11,19 +11,20 @@ namespace SRPIntranet.IntegrationTest
         [TestMethod]
         public void Connect_Refresh()
         {
-            var service = new SrbWebOpenIdConnect("http://localhost:44300");
+            var service = new SrbWebOpenIdConnect("http://localhost:44300", "openid offline_access");
             service.Connect("pau", "pwd", "/connect/token");
             service.TokenOpenId.RefreshToken.Should().NotBeNullOrEmpty();
-            var functions = service.GetClaim("functions");
+            
             var roles = service.GetClaim("role");
 
-            var resWithLogin = service.TestUrl("/api/ClientMenu", HttpMethod.Get);
+            var resWithLogin = service.TestApi("/api/message", HttpMethod.Get);
             resWithLogin.Should().NotBeNullOrEmpty();
 
-            service.Refresh("/connect/token", service.TokenOpenId.RefreshToken);
-            var resWithRefresh = service.TestUrl("/api/ClientMenu", HttpMethod.Get);
+            //service.Refresh("/connect/token", service.TokenOpenId.RefreshToken);
+            //var resWithRefresh = service.TestUrl("/api/ClientMenu", HttpMethod.Get);
 
-            var test = service.TestUrl("http://localhost:44302/api/PlanningRetours", HttpMethod.Get);
+            // challenge on WebApiClient
+            var test = service.TestApi("http://localhost:44301/api/message", HttpMethod.Get);
         }
     }
 }
