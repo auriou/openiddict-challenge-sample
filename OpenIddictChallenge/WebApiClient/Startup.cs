@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -17,23 +18,30 @@ namespace Mvc.Client
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = OAuthIntrospectionDefaults.AuthenticationScheme;
-            })
+            services.AddDataProtection()
+                .PersistKeysToFileSystem(new System.IO.DirectoryInfo(@"C:\0-Temp\dataProtection"))
+                .SetApplicationName("MyAPP");
+            services.AddOpenIddict()
+                //This adds a "Bearer" authentication scheme
+                .AddValidation();
 
-            .AddOAuthIntrospection(options =>
-            {
-                options.Authority = new Uri("http://localhost:44300/");
-                //options.Audiences.Add("webapi1");
-                options.ClientId = "webapi1";
-                options.ClientSecret = "846B62D0-DEF9-4215-A99D-86E6B8DAB342";
-                options.RequireHttpsMetadata = false;
+            //services.AddAuthentication(options =>
+            //{
+            //    options.DefaultScheme = OAuthIntrospectionDefaults.AuthenticationScheme;
+            //})
 
-                // Note: you can override the default name and role claims:
-                // options.NameClaimType = "custom_name_claim";
-                // options.RoleClaimType = "custom_role_claim";
-            });
+            //.AddOAuthIntrospection(options =>
+            //{
+            //    options.Authority = new Uri("http://localhost:44300/");
+            //    //options.Audiences.Add("webapi1");
+            //    options.ClientId = "webapi1";
+            //    options.ClientSecret = "846B62D0-DEF9-4215-A99D-86E6B8DAB342";
+            //    options.RequireHttpsMetadata = false;
+
+            //    // Note: you can override the default name and role claims:
+            //    // options.NameClaimType = "custom_name_claim";
+            //    // options.RoleClaimType = "custom_role_claim";
+            //});
             //services.AddAuthentication(options =>
             //{
             //    //options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;

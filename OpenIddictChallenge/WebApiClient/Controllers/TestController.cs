@@ -10,7 +10,7 @@ namespace Mvc.Client.Controllers
     public class TestController : Controller
     {
 
-        [HttpGet("message")]
+        [HttpGet("message"), Authorize]
         public async Task<IActionResult> GetMessage()
         {
             return Content($"has been successfully authenticated.");

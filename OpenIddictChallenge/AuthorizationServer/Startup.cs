@@ -12,6 +12,7 @@ using System;
 using OpenIddict.Core;
 using OpenIddict.EntityFrameworkCore.Models;
 using OpenIddict.Abstractions;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace AuthorizationServer
 {
@@ -44,6 +45,7 @@ namespace AuthorizationServer
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddDefaultTokenProviders();
 
+
             services.AddTransient<IUserStore<ApplicationUser>, FakeUserStore>();
             services.AddTransient<IRoleStore<ApplicationRole>, FakeRoleStore>();
             services.AddTransient<IPasswordHasher<ApplicationUser>, FakePasswordHasher>();
@@ -62,6 +64,10 @@ namespace AuthorizationServer
                 options.ClaimsIdentity.UserIdClaimType = OpenIdConnectConstants.Claims.Subject;
                 options.ClaimsIdentity.RoleClaimType = OpenIdConnectConstants.Claims.Role;
             });
+
+            services.AddDataProtection()
+                .PersistKeysToFileSystem(new System.IO.DirectoryInfo(@"C:\0-Temp\dataProtection"))
+                .SetApplicationName("MyAPP");
 
             services.AddOpenIddict()
 
